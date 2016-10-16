@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ################################################################################
 #
 #  build_dpdk.sh
@@ -17,9 +16,9 @@
 #  Define Global Variables and Functions
 ################################################################################
 
-URL=http://www.dpdk.org/browse/dpdk/snapshot/dpdk-2.0.0.tar.gz
+URL=http://fast.dpdk.org/rel/dpdk-16.04.tar.xz
 BASEDIR=/root
-VERSION=2.0.0
+VERSION=16.04
 PACKAGE=dpdk
 DPDKROOT=$BASEDIR/$PACKAGE-$VERSION
 CONFIG=x86_64-native-linuxapp-gcc
@@ -27,23 +26,34 @@ CONFIG=x86_64-native-linuxapp-gcc
 
 # Download/Build DPDK
 cd $BASEDIR
-curl $URL | tar xz
+wget $URL
+tar -xf $PACKAGE-$VERSION.tar.xz
 cd $DPDKROOT
+ sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_linuxapp \
+  && sed -i 's/CONFIG_RTE_LIBRTE_KNI=y/CONFIG_RTE_LIBRTE_KNI=n/' ${DPDKROOT}/config/common_linuxapp \
+  && sed -i 's/CONFIG_RTE_KNI_KMOD=y/CONFIG_RTE_KNI_KMOD=n/' ${DPDKROOT}/config/common_linuxapp
+ 
+# don't build unnecessary stuff, can be reversed in dpdk_config.sh
+sed -i 's/CONFIG_RTE_APP_TEST=y/CONFIG_RTE_APP_TEST=n/' ${DPDKROOT}/config/common_base \
+  && sed -i 's/CONFIG_RTE_TEST_PMD=y/CONFIG_RTE_TEST_PMD=n/' ${DPDKROOT}/config/common_base \
+  && sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_base \
+  && sed -i 's/CONFIG_RTE_LIBRTE_IGB_PMD=y/CONFIG_RTE_LIBRTE_IGB_PMD=n/' ${DPDKROOT}/config/common_base \
+  && sed -i 's/CONFIG_RTE_LIBRTE_IXGBE_PMD=y/CONFIG_RTE_LIBRTE_IXGBE_PMD=n/' ${DPDKROOT}/config/common_base \
 make config T=$CONFIG
 sed -ri 's,(PMD_PCAP=).*,\1y,' build/.config
 make config T=$CONFIG install
 
 # Download/Build pktgen-dpdk
-URL=http://www.dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-2.8.5-2.tar.xz
-BASEDIR=/root
-VERSION=2.8.5-2
-PACKAGE=pktgen
-PKTGENROOT=$BASEDIR/$PACKAGE-$VERSION
-cd $BASEDIR
-curl $URL | tar xz
+#URL=http://dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.0.14.tar.xz
+#BASEDIR=/root
+#VERSION=3.0.14
+#PACKAGE=pktgen
+#PKTGENROOT=$BASEDIR/$PACKAGE-$VERSION
+#cd $BASEDIR
+#curl $URL | tar xz
 
 # Silence compiler info message
-sed -i '/Wwrite-strings$/ s/$/ -Wno-unused-but-set-variable/' $DPDKROOT/mk/toolchain/gcc/rte.vars.mk
-cd $PKTGENROOT
-make
-ln -s $PKTGENROOT/app/app/$CONFIG/pktgen /usr/bin
+#sed -i '/Wwrite-strings$/ s/$/ -Wno-unused-but-set-variable/' $DPDKROOT/mk/toolchain/gcc/rte.vars.mk
+#cd $PKTGENROOT
+#make
+#ln -s $PKTGENROOT/app/app/$CONFIG/pktgen /usr/bin
