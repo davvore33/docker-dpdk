@@ -16,11 +16,11 @@
 #  Define Global Variables and Functions
 ################################################################################
 
-URL=http://fast.dpdk.org/rel/dpdk-16.04.tar.xz
+URL=http://fast.dpdk.org/rel/dpdk-16.07.2.tar.xz
 BASEDIR=/root
-VERSION=16.04
+VERSION=16.07.2
 PACKAGE=dpdk
-DPDKROOT=$BASEDIR/$PACKAGE-$VERSION
+DPDKROOT=$BASEDIR/$PACKAGE-stable-$VERSION
 CONFIG=x86_64-native-linuxapp-gcc
 
 
@@ -38,10 +38,12 @@ sed -i 's/CONFIG_RTE_APP_TEST=y/CONFIG_RTE_APP_TEST=n/' ${DPDKROOT}/config/commo
   && sed -i 's/CONFIG_RTE_TEST_PMD=y/CONFIG_RTE_TEST_PMD=n/' ${DPDKROOT}/config/common_base \
   && sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_base \
   && sed -i 's/CONFIG_RTE_LIBRTE_IGB_PMD=y/CONFIG_RTE_LIBRTE_IGB_PMD=n/' ${DPDKROOT}/config/common_base \
-  && sed -i 's/CONFIG_RTE_LIBRTE_IXGBE_PMD=y/CONFIG_RTE_LIBRTE_IXGBE_PMD=n/' ${DPDKROOT}/config/common_base \
+  && sed -i 's/CONFIG_RTE_LIBRTE_IXGBE_PMD=y/CONFIG_RTE_LIBRTE_IXGBE_PMD=n/' ${DPDKROOT}/config/common_base
+
 make config T=$CONFIG
 sed -ri 's,(PMD_PCAP=).*,\1y,' build/.config
-make config T=$CONFIG install
+make 
+make install
 
 # Download/Build pktgen-dpdk
 #URL=http://dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.0.14.tar.xz
