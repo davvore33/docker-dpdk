@@ -5,7 +5,18 @@ LABEL "RUN docker run -it --privileged -v /sys/bus/pci/devices:/sys/bus/pci/devi
 
 # Setup yum repos, or use subscription-manager
 # Install DPDK support packages.
-RUN  apt-get update && apt-get install -y libpcap-dev wget xz-utils gcc automake autoconf libtool make python pciutils
+RUN  apt-get update && apt-get install -y libpcap-dev \
+  wget \
+  xz-utils \
+  gcc \
+  automake \
+  autoconf \
+  libtool \
+  ethtool \
+  make \
+  python \
+  python-pip \
+  pciutils
 
 # Build DPDK and pktgen-dpdk for x86_64-native-linuxapp-gcc.
 WORKDIR /root
