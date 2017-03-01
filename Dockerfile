@@ -9,21 +9,22 @@ LABEL "RUN docker run -it --privileged\
 
 # Setup yum repos, or use subscription-manager
 # Install DPDK support packages.
-RUN  apt-get update && apt-get install -y libpcap-dev \
+RUN  apt-get update && \
+  apt-get install && \
+  apt-get install -y libpcap-dev \
   wget \
   xz-utils \
-  gcc \
-  automake \
-  autoconf \
+  build-essential \
   libtool \
   ethtool \
-  make \
   python \
   python-pip \
   pciutils \
   kmod \
   net-tools \
-  nano
+  nano \
+  hugepages \
+  linux-headers-`uname -r`
 
 RUN pip install --upgrade pip
 RUN pip install pyelftools
