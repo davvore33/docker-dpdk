@@ -22,7 +22,6 @@ RUN  apt-get update && apt-get install -y libpcap-dev \
   python-pip \
   pciutils \
   kmod \
-  linux-generic \
   net-tools \
   nano
 
