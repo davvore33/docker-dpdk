@@ -20,7 +20,14 @@ RUN  apt-get update && apt-get install -y libpcap-dev \
   make \
   python \
   python-pip \
-  pciutils
+  pciutils \
+  kmod \
+  linux-generic \
+  net-tools \
+  nano
+
+RUN pip install --upgrade pip
+RUN pip install pyelftools
 
 # Build DPDK and pktgen-dpdk for x86_64-native-linuxapp-gcc.
 WORKDIR /root
