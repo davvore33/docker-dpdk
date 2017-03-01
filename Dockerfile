@@ -33,6 +33,7 @@ RUN pip install pyelftools
 WORKDIR /root
 COPY ./build_dpdk.sh /root/build_dpdk.sh
 COPY ./env.sh /root/env.sh
+COPY ./provision.sh /root/provision.sh
 COPY ./dpdk-profile.sh /etc/profile.d/
 RUN chmod 777 /root/*.sh
 RUN /root/build_dpdk.sh
