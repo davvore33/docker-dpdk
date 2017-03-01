@@ -46,7 +46,7 @@ make
 make install
 
 # Copy the provisioning script into our dbase dir
-cp provision.sh $DPDKROOT
+cp /root/provision.sh $DPDKROOT
 
 # Download/Build pktgen-dpdk
 #URL=http://dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.0.14.tar.xz
