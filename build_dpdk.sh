@@ -45,6 +45,9 @@ sed -ri 's,(PMD_PCAP=).*,\1y,' build/.config
 make 
 make install
 
+# Copy the provisioning script into our dbase dir
+cp provision.sh $DPDKROOT
+
 # Download/Build pktgen-dpdk
 #URL=http://dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.0.14.tar.xz
 #BASEDIR=/root

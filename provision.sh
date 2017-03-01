@@ -7,6 +7,12 @@
 #  * https://gist.github.com/ConradIrwin/9077440
 #  * http://dpdk.org/doc/quick-start
 
+# Path to the build dir
+export RTE_SDK=`pwd`
+
+# Target of build process
+export RTE_TARGET=x86_64-native-linuxapp-gcc
+
 # Configure hugepages
 # You can later check if this change was successful with `cat /proc/meminfo`
 # Hugepages setup should be done as early as possible after boot
