@@ -16,11 +16,11 @@
 #  Define Global Variables and Functions
 ################################################################################
 
-URL=http://fast.dpdk.org/rel/dpdk-16.07.2.tar.xz
+URL=http://fast.dpdk.org/rel/dpdk-16.11.tar.xz
 BASEDIR=/root
-VERSION=16.07.2
+VERSION=16.11
 PACKAGE=dpdk
-DPDKROOT=$BASEDIR/$PACKAGE-stable-$VERSION
+DPDKROOT=$BASEDIR/$PACKAGE-$VERSION
 CONFIG=x86_64-native-linuxapp-gcc
 
 

@@ -1,4 +1,4 @@
-FROM ubuntu:yakkety
+FROM ubuntu:trusty
 MAINTAINER NachtZ<nachtz@outlook.com>
 
 LABEL "RUN docker run -it --privileged\
@@ -7,11 +7,10 @@ LABEL "RUN docker run -it --privileged\
  -v /sys/devices/system/node:/sys/devices/system/node\
  -v /dev:/dev --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE"
 
-# Setup yum repos, or use subscription-manager
 # Install DPDK support packages.
-RUN  apt-get update && \
-  apt-get install && \
-  apt-get install -y libpcap-dev \
+
+RUN apt update && apt upgrade -y
+RUN apt install -y libpcap-dev \
   wget \
   xz-utils \
   build-essential \
@@ -24,11 +23,22 @@ RUN  apt-get update && \
   net-tools \
   nano \
   hugepages \
-  linux-headers-`uname -r`
+  protobuf-compiler \
+  libprotobuf-dev \ 
+  python-protobuf \
+  libprotobuf-c0 \
+  libprotobuf-c0-dev \
+  libprotobuf8 \
+  libprotoc8 \
+  protobuf-c-compiler \
+  python-pip \
+  unzip \
+  ncurses-dev
 
-RUN pip install --upgrade pip
-RUN pip install pyelftools
+RUN pip install --upgrade pip && \
+    pip install pyelftools
 
+    
 # Build DPDK and pktgen-dpdk for x86_64-native-linuxapp-gcc.
 WORKDIR /root
 COPY ./build_dpdk.sh /root/build_dpdk.sh
@@ -38,5 +48,18 @@ COPY ./dpdk-profile.sh /etc/profile.d/
 RUN chmod 777 /root/*.sh
 RUN /root/build_dpdk.sh
 
+# WARP17 part
+ENV RTE_SDK /usr/local/share/dpdk
+ENV RTE_TARGET x86_64-native-linuxapp-gcc
+COPY ./build_warp17.sh /root/build_warp17.sh
+RUN chmod 777 /root/*.sh
+RUN /root/build_warp17.sh
+
+# python dep
+#RUN pip install virtualenv && \
+#    virtualenv warp17-venv && \
+#    source warp17-venv/bin/activate && \
+#    pip install -r python/requirements.txt
+#    
 # Defaults to a bash shell, you could put your DPDK-based application here.
 CMD ["/bin/bash"]
