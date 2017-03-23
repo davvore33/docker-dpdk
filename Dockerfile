@@ -41,19 +41,19 @@ RUN pip install --upgrade pip && \
     
 # Build DPDK and pktgen-dpdk for x86_64-native-linuxapp-gcc.
 WORKDIR /root
+RUN mkdir /mnt/huge
+#    mount -t hugetlbfs nodev /mnt/huge
 COPY ./build_dpdk.sh /root/build_dpdk.sh
-COPY ./env.sh /root/env.sh
-COPY ./provision.sh /root/provision.sh
-COPY ./dpdk-profile.sh /etc/profile.d/
-RUN chmod 777 /root/*.sh
-RUN /root/build_dpdk.sh
+RUN chmod 777 /root/*.sh && \
+    /root/build_dpdk.sh
 
 # WARP17 part
-ENV RTE_SDK /usr/local/share/dpdk
+ENV RTE_SDK /root/dpdk-16.11
 ENV RTE_TARGET x86_64-native-linuxapp-gcc
+#/usr/local/share/dpdk
 COPY ./build_warp17.sh /root/build_warp17.sh
-RUN chmod 777 /root/*.sh
-RUN /root/build_warp17.sh
+RUN chmod 777 /root/*.sh && \
+    /root/build_warp17.sh
 
 # python dep
 #RUN pip install virtualenv && \

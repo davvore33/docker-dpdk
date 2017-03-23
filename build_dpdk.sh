@@ -30,7 +30,6 @@ wget $URL
 tar -xf $PACKAGE-$VERSION.tar.xz
 cd $DPDKROOT
  sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_linuxapp \
-  && sed -i 's/CONFIG_RTE_LIBRTE_KNI=y/CONFIG_RTE_LIBRTE_KNI=n/' ${DPDKROOT}/config/common_linuxapp \
   && sed -i 's/CONFIG_RTE_KNI_KMOD=y/CONFIG_RTE_KNI_KMOD=n/' ${DPDKROOT}/config/common_linuxapp
  
 # don't build unnecessary stuff, can be reversed in dpdk_config.sh
@@ -42,11 +41,11 @@ sed -i 's/CONFIG_RTE_APP_TEST=y/CONFIG_RTE_APP_TEST=n/' ${DPDKROOT}/config/commo
 
 make config T=$CONFIG
 sed -ri 's,(PMD_PCAP=).*,\1y,' build/.config
-make 
-make install
+#make 
+make install T=$CONFIG
 
 # Copy the provisioning script into our dbase dir
-cp /root/provision.sh $DPDKROOT
+#cp /root/provision.sh $DPDKROOT
 
 # Download/Build pktgen-dpdk
 #URL=http://dpdk.org/browse/apps/pktgen-dpdk/snapshot/pktgen-3.0.14.tar.xz
