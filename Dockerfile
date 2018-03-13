@@ -1,16 +1,11 @@
 FROM ubuntu:xenial
 MAINTAINER Matteo<davvore33@gmail.com> 
 
-LABEL "RUN docker run -it --privileged\
- -v /sys/bus/pci/devices:/sys/bus/pci/devices\
- -v /sys/kernel/mm/hugepages:/sys/kernel/mm/hugepages\
- -v /sys/devices/system/node:/sys/devices/system/node\
- -v /dev:/dev --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE"
-
 # Install DPDK support packages.
 
 RUN apt update && apt upgrade -y
 RUN apt install -y libpcap-dev \
+  sudo \
   wget \
   xz-utils \
   build-essential \
@@ -26,14 +21,12 @@ RUN apt install -y libpcap-dev \
   protobuf-compiler \
   libprotobuf-dev \ 
   python-protobuf \
-  libprotobuf-c0 \
-  libprotobuf-c0-dev \
-  libprotobuf8 \
-  libprotoc8 \
-  protobuf-c-compiler \
   python-pip \
   unzip \
   ncurses-dev
+COPY install_compatibility_pkg.sh /root/install_compatibility_pkg.sh
+RUN chmod 777 /root/*.sh && \
+    /root/install_compatibility_pkg.sh
 
 RUN pip install --upgrade pip && \
     pip install pyelftools
@@ -55,11 +48,6 @@ COPY ./build_warp17.sh /root/build_warp17.sh
 RUN chmod 777 /root/*.sh && \
     /root/build_warp17.sh
 
-# python dep
-#RUN pip install virtualenv && \
-#    virtualenv warp17-venv && \
-#    source warp17-venv/bin/activate && \
-#    pip install -r python/requirements.txt
-#    
+
 # Defaults to a bash shell, you could put your DPDK-based application here.
 CMD ["/bin/bash"]
