@@ -1,5 +1,5 @@
-FROM ubuntu:trusty
-MAINTAINER NachtZ<nachtz@outlook.com>
+FROM ubuntu:xenial
+MAINTAINER Matteo<davvore33@gmail.com> 
 
 LABEL "RUN docker run -it --privileged\
  -v /sys/bus/pci/devices:/sys/bus/pci/devices\
