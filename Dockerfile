@@ -27,8 +27,33 @@ RUN apt install -y libpcap-dev \
   protobuf-c-compiler \
   python-pip \
   unzip \
-  ncurses-dev
-
+  ncurses-dev \
+  flex \
+  libnuma1 \
+  libgfortran3 \
+  autoconf \
+  quilt \
+  curl \
+  m4 \
+  graphviz \
+  tk8.4 \
+  automake \
+  pkg-config \
+  gfortran \
+  python-libxml2 \
+  tk \
+  debhelper \
+  dkms \
+  tcl8.4 \
+  libnl1 \
+  tcl \
+  libglib2.0-0 \
+  chrpath \
+  dpatch \
+  bison \
+  swig \
+  lsof \
+  linux-headers-generic
 RUN pip install --upgrade pip && \
     pip install pyelftools
 
@@ -37,6 +62,10 @@ RUN pip install --upgrade pip && \
 WORKDIR /root
 RUN mkdir /mnt/huge
 #    mount -t hugetlbfs nodev /mnt/huge
+COPY ./install_mellanox_ofed.sh /root/install_mellanox_ofed.sh
+RUN chmod 777 /root/*.sh && \
+    /root/install_mellanox_ofed.sh
+    
 COPY ./build_dpdk.sh /root/build_dpdk.sh
 RUN chmod 777 /root/*.sh && \
     /root/build_dpdk.sh
