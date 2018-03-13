@@ -1,11 +1,5 @@
-FROM ubuntu:xenial
+FROM ubuntu:trusty
 MAINTAINER Matteo<davvore33@gmail.com> 
-
-LABEL "RUN docker run -it --privileged\
- -v /sys/bus/pci/devices:/sys/bus/pci/devices\
- -v /sys/kernel/mm/hugepages:/sys/kernel/mm/hugepages\
- -v /sys/devices/system/node:/sys/devices/system/node\
- -v /dev:/dev --name NAME -e NAME=NAME -e IMAGE=IMAGE IMAGE"
 
 # Install DPDK support packages.
 
@@ -55,11 +49,5 @@ COPY ./build_warp17.sh /root/build_warp17.sh
 RUN chmod 777 /root/*.sh && \
     /root/build_warp17.sh
 
-# python dep
-#RUN pip install virtualenv && \
-#    virtualenv warp17-venv && \
-#    source warp17-venv/bin/activate && \
-#    pip install -r python/requirements.txt
-#    
 # Defaults to a bash shell, you could put your DPDK-based application here.
 CMD ["/bin/bash"]
