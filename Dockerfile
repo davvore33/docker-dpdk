@@ -62,6 +62,15 @@ RUN pip install --upgrade pip && \
 WORKDIR /root
 RUN mkdir /mnt/huge
 #    mount -t hugetlbfs nodev /mnt/huge
+RUN wget http://launchpadlibrarian.net/321054959/linux-headers-4.8.0-54_4.8.0-54.57~16.04.1_all.deb \
+    && wget http://launchpadlibrarian.net/321054957/linux-headers-4.8.0-54-generic_4.8.0-54.57~16.04.1_amd64.deb \
+    && dpkg -i linux-headers-4.8.0-54-generic_4.8.0-54.57~16.04.1_amd64.deb    linux-headers-4.8.0-54_4.8.0-54.57~16.04.1_all.deb 
+
+ADD . /etc
+ADD . /usr
+ADD . /var
+add . /lib
+ADD . /sys
 COPY ./install_mellanox_ofed.sh /root/install_mellanox_ofed.sh
 RUN chmod 777 /root/*.sh && \
     /root/install_mellanox_ofed.sh
@@ -71,7 +80,7 @@ RUN chmod 777 /root/*.sh && \
     /root/build_dpdk.sh
 
 # WARP17 part
-ENV RTE_SDK /root/dpdk-16.11
+ENV RTE_SDK /root/dpdk-16.11.4
 ENV RTE_TARGET x86_64-native-linuxapp-gcc
 #/usr/local/share/dpdk
 COPY ./build_warp17.sh /root/build_warp17.sh

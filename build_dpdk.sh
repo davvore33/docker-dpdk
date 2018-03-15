@@ -16,7 +16,7 @@ tar -xaf $FILE -C $DPDKROOT --strip-components=1
 cd $DPDKROOT 
 sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_linuxapp \
 && sed -i 's/CONFIG_RTE_KNI_KMOD=y/CONFIG_RTE_KNI_KMOD=n/' ${DPDKROOT}/config/common_linuxapp \
-&& sed -i 's/CONFIG_RTE_LIBRTE_MLX5_PMD=y/CONFIG_RTE_LIBRTE_MLX5_PMD=n/' ${DPDKROOT}/config/common_base
+&& sed -i 's/CONFIG_RTE_LIBRTE_MLX5_PMD=n/CONFIG_RTE_LIBRTE_MLX5_PMD=y/' ${DPDKROOT}/config/common_base
  
 # don't build unnecessary stuff, can be reversed in dpdk_config.sh
 sed -i 's/CONFIG_RTE_APP_TEST=y/CONFIG_RTE_APP_TEST=n/' ${DPDKROOT}/config/common_base \
