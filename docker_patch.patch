@@ -1,0 +1,45 @@
+Index: config/common_base
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- config/common_base	(date 1510705493000)
++++ config/common_base	(date 1541684401000)
+@@ -179,7 +179,7 @@
+ # Compile burst-oriented IGB & EM PMD drivers
+ #
+ CONFIG_RTE_LIBRTE_EM_PMD=y
+-CONFIG_RTE_LIBRTE_IGB_PMD=y
++CONFIG_RTE_LIBRTE_IGB_PMD=n
+ CONFIG_RTE_LIBRTE_E1000_DEBUG_INIT=n
+ CONFIG_RTE_LIBRTE_E1000_DEBUG_RX=n
+ CONFIG_RTE_LIBRTE_E1000_DEBUG_TX=n
+@@ -190,7 +190,7 @@
+ #
+ # Compile burst-oriented IXGBE PMD driver
+ #
+-CONFIG_RTE_LIBRTE_IXGBE_PMD=y
++CONFIG_RTE_LIBRTE_IXGBE_PMD=n
+ CONFIG_RTE_LIBRTE_IXGBE_DEBUG_INIT=n
+ CONFIG_RTE_LIBRTE_IXGBE_DEBUG_RX=n
+ CONFIG_RTE_LIBRTE_IXGBE_DEBUG_TX=n
+
+Index: config/common_linuxapp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- config/common_linuxapp	(date 1510705493000)
++++ config/common_linuxapp	(date 1541684335000)
+@@ -39,9 +39,9 @@
+ CONFIG_RTE_EXEC_ENV_LINUXAPP=y
+ 
+ CONFIG_RTE_EAL_NUMA_AWARE_HUGEPAGES=y
+-CONFIG_RTE_EAL_IGB_UIO=y
++CONFIG_RTE_EAL_IGB_UIO=n
+ CONFIG_RTE_EAL_VFIO=y
+-CONFIG_RTE_KNI_KMOD=y
++CONFIG_RTE_KNI_KMOD=n
+ CONFIG_RTE_LIBRTE_KNI=y
+ CONFIG_RTE_LIBRTE_PMD_KNI=y
+ CONFIG_RTE_LIBRTE_VHOST=y

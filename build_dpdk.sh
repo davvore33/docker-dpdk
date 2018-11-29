@@ -1,30 +1,146 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# Copyright (c) 2018, Juniper Networks, Inc. All rights reserved.
+#
+#
+# The contents of this file are subject to the terms of the BSD 3 clause
+# License (the "License"). You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# https://github.com/Juniper/warp17/blob/master/LICENSE.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+# contributors may be used to endorse or promote products derived from this
+# software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# File name:
+#     build_dpdk.sh
+#
+# Description:
+#     Dpdk builder and configuration
+#
+# Author:
+#     Matteo Triggiani
+#
+# Initial Created:
+#     06/22/2018
+#
+# Notes:
+#     Receives dpdk version as argument "xx.xx.x"
 
-VERSION="16.11.4"
-FILE="dpdk-$VERSION.tar.xz"
-URL=http://fast.dpdk.org/rel/$FILE
-BASEDIR=/root
-DPDKROOT=$BASEDIR/dpdk-$VERSION
-CONFIG=x86_64-native-linuxapp-gcc
+# Parse args
+source /root/warp17/common/common.sh
+set -e
 
+usage="$0 -v dpdk version you want to install -i Non-interactive"
+dest="/opt"
+tmp="/tmp"
+kernel=`uname -r`
+jobs=1
 
-# Download/Build DPDK
-cd $BASEDIR
-wget $URL
-tar -xf $FILE
-cd $DPDKROOT
-sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_linuxapp \
-&& sed -i 's/CONFIG_RTE_KNI_KMOD=y/CONFIG_RTE_KNI_KMOD=n/' ${DPDKROOT}/config/common_linuxapp
-&& sed -i 's/CONFIG_RTE_KNI_KMOD=y/CONFIG_RTE_KNI_KMOD=n/' ${DPDKROOT}/config/common_linuxapp
- 
-# don't build unnecessary stuff, can be reversed in dpdk_config.sh
-sed -i 's/CONFIG_RTE_APP_TEST=y/CONFIG_RTE_APP_TEST=n/' ${DPDKROOT}/config/common_base \
-  && sed -i 's/CONFIG_RTE_TEST_PMD=y/CONFIG_RTE_TEST_PMD=n/' ${DPDKROOT}/config/common_base \
-  && sed -i 's/CONFIG_RTE_EAL_IGB_UIO=y/CONFIG_RTE_EAL_IGB_UIO=n/' ${DPDKROOT}/config/common_base \
-  && sed -i 's/CONFIG_RTE_LIBRTE_IGB_PMD=y/CONFIG_RTE_LIBRTE_IGB_PMD=n/' ${DPDKROOT}/config/common_base \
-  && sed -i 's/CONFIG_RTE_LIBRTE_IXGBE_PMD=y/CONFIG_RTE_LIBRTE_IXGBE_PMD=n/' ${DPDKROOT}/config/common_base
+while getopts "v:n:j:i" opt; do
+	case $opt in
+	v)
+		ver=$OPTARG
+		name="dpdk-$ver"
+		file="$name.tar.xz"
+		url="http://fast.dpdk.org/rel/$file"
+		;;
+	n)
+		dry_run=1
+		;;
+	i)
+		interactive=1
+		;;
+	j)
+		jobs=$OPTARG
+		;;
+	\?)
+		usage $0
+		;;
+	esac
+done
 
-make config T=$CONFIG
-sed -ri 's,(PMD_PCAP=).*,\1y,' build/.config
-#make 
-make install T=$CONFIG
+([[ -z $ver ]]) &&
+usage $0
+
+# Getting dpdk from the repo
+# $1 destination folder
+# $2 temporary folder
+function get {
+	cd $2
+	exec_cmd "Downloading the package" wget $url
+	mkdir $name
+	exec_cmd "Extracting the package" tar -xaf $file -C $name --strip-components=1
+	mv -f $name $1
+}
+
+# Patch dpdk
+# $1 dpdk folder
+# $2 patch name
+function apply_patch {
+	cd $1
+	patch -p0 < $2
+}
+
+# Build dpdk
+# $1 dpdk folder
+# $2 compiler version
+function build {
+	cd $1
+	apply_patch $1 "/root/docker_patch.patch"
+	find -name "*.rej" -exec cat {} +
+	exec_cmd "Compiling dpdk for $2 arch" make T=$2 -j $3 install
+}
+
+# Install dpdk in the local machine
+# $1 dpdk folder
+function install {
+	if [[ -z $interactive ]]; then
+		confirm "Installing the dpdk lib"
+	fi
+	check_root
+	exec_cmd "Copying igb_uio in $kernel folder" cp $1/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko /lib/modules/$kernel/kernel/drivers/uio/
+	exec_cmd "Generating modules and map files." depmod -a
+	exec_cmd "Add uio mod" modprobe uio
+	exec_cmd "Add igb_uio mod" modprobe igb_uio
+}
+
+# Skipping in case dpdk is already there
+if [[ -d "$dest/$name/x86_64-native-linuxapp-gcc/build" ]]; then
+	echo dpdk-$ver is already there
+else
+	rm -rf $dest/$name
+	get $dest $tmp
+	build "$dest/$name" x86_64-native-linuxapp-gcc $jobs
+
+fi
+
+# install "$dest/$name"
+exit
